@@ -1,0 +1,12 @@
+{
+  "editor.tabSize": 4,
+  "editor.formatOnSave": true,
+  "files.autoSave": "afterDelay",
+  "python.linting.enabled": true,
+  "python.defaultInterpreterPath": "/workspace/.venv/bin/python",
+  "code-runner.executorMap": {
+      "python": "/workspace/.venv/bin/python -u"
+  },
+  "python.linting.pylintEnabled": true,
+  "python.formatting.provider": "black"
+}

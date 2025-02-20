@@ -1,0 +1,19 @@
+{
+  "name": "Python DevContainer",
+  "dockerComposeFile": [
+    "../docker-compose.yml"
+    // "./docker-compose.override.yml"
+  ],
+  "overrideCommand": true,
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "extensions": [
+    "ms-python.python",            // Pythonサポート
+    "ms-python.vscode-pylance",    // 型ヒント・補完支援
+    "charliermarsh.ruff",          // Python用linter
+    "ms-python.black-formatter",   // Blackフォーマッター
+    "gruntfuggly.auto-init"        // __init__.py自動生成
+  ],
+  "postCreateCommand": "/workspace/.devcontainer/scripts/postCreateScript.sh",
+
+}

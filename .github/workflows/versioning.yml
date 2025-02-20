@@ -28,12 +28,14 @@ jobs:
           if [[ -z "$latest_tag" ]]; then
             latest_tag="v0.0.0"
           fi
-          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+          echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
 
       - name: Bump version
         id: bump_version
         run: |
-          IFS='.' read -r -a parts <<< "${{ env.latest_tag/v/ }}"
+          # "vX.Y.Z" → "X.Y.Z" に変換
+          clean_tag="${LATEST_TAG#v}"
+          IFS='.' read -r -a parts <<< "$clean_tag"
           major="${parts[0]}"
           minor="${parts[1]}"
           patch="${parts[2]}"
@@ -46,18 +48,18 @@ jobs:
           fi
 
           new_version="v$major.$minor.$patch"
-          echo "new_version=$new_version" >> $GITHUB_ENV
+          echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
           echo "VERSION=$new_version" >> $GITHUB_ENV
 
       - name: Create Version File
-        run: echo "${{ env.new_version }}" > VERSION
+        run: echo "${{ env.NEW_VERSION }}" > VERSION
 
       - name: Create PR to main
         uses: peter-evans/create-pull-request@v6
         with:
           base: main
-          branch: version-bump/${{ env.new_version }}
-          title: "Bump version to ${{ env.new_version }}"
-          body: "Automated version bump to ${{ env.new_version }}"
+          branch: version-bump/${{ env.NEW_VERSION }}
+          title: "Bump version to ${{ env.NEW_VERSION }}"
+          body: "Automated version bump to ${{ env.NEW_VERSION }}"
           labels: automated, versioning
-          commit-message: "Bump version to ${{ env.new_version }}"
+          commit-message: "Bump version to ${{ env.NEW_VERSION }}"

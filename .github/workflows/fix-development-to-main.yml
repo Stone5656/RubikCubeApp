@@ -1,0 +1,27 @@
+name: Create PR from fix/development to main
+
+on:
+  push:
+    branches:
+      - fix
+      - development
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine branch name
+        id: branch_name
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Create Pull Request to main
+        uses: peter-evans/create-pull-request@v6
+        with:
+          base: main
+          branch: ${{ env.BRANCH_NAME }}
+          title: "Merge ${{ env.BRANCH_NAME }} into main"
+          body: "Automated PR to merge ${{ env.BRANCH_NAME }} into main"
+          labels: automated

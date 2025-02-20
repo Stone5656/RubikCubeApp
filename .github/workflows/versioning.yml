@@ -6,6 +6,9 @@ on:
       - fix
       - development
 
+permissions:
+  contents: write
+
 jobs:
   versioning:
     runs-on: ubuntu-latest

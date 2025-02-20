@@ -5,6 +5,9 @@ on:
     branches:
       - release
 
+permissions:
+  contents: write
+
 jobs:
   test-and-merge:
     runs-on: ubuntu-latest

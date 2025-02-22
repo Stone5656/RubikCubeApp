@@ -24,8 +24,9 @@ jobs:
 
       - name: Create Pull Request to main
         uses: peter-evans/create-pull-request@v6
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}  # PAT を使用
         with:
-          token: ${{ secrets.PAT_TOKEN }}  # `PAT_TOKEN` を使用
           base: main
           branch: ${{ env.BRANCH_NAME }}
           title: "Merge ${{ env.BRANCH_NAME }} into main"

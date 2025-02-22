@@ -70,7 +70,15 @@ jobs:
           git commit -m "Bump version to ${{ env.NEW_VERSION }}" || echo "No changes to commit"
           git push --force-with-lease https://x-access-token:${PAT_TOKEN}@github.com/Stone5656/RubikCubeApp.git ${{ github.ref_name }}
 
+      - name: Check if changes exist before PR
+        id: check_changes
+        run: |
+          DIFF_COUNT=$(git rev-list --right-only --count origin/main...origin/${{ github.ref_name }})
+          echo "DIFF_COUNT=$DIFF_COUNT" >> $GITHUB_ENV
+          echo "Diff count: $DIFF_COUNT"
+
       - name: Create PR from fix/development to main
+        if: env.DIFF_COUNT != '0' # 変更がある場合のみPR作成
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.PAT_TOKEN }}

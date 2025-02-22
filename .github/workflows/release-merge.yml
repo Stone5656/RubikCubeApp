@@ -4,12 +4,15 @@ on:
   pull_request:
     branches:
       - release
+    types:
+      - closed  # PR がマージされた時のみ実行
 
 permissions:
-  contents: write
+  contents: write  # `git push` を許可
 
 jobs:
   test-and-merge:
+    if: github.event.pull_request.merged == true  # PR がマージされた場合のみ実行
     runs-on: ubuntu-latest
 
     steps:
@@ -22,9 +25,11 @@ jobs:
 
       - name: Merge if tests pass
         if: success()
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}  # PAT を使用
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git checkout release
-          git merge --no-ff main -m "Auto-merge main into release after successful tests"
-          git push origin release
+          git merge --no-ff origin/release -m "Auto-merge main into release after successful tests"
+          git push https://x-access-token:${PAT_TOKEN}@github.com/Stone5656/RubikCubeApp.git release

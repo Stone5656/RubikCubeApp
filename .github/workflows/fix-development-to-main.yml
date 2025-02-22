@@ -8,10 +8,12 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write  # PR 作成権限を付与
 
 jobs:
   create-pr:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,6 +25,7 @@ jobs:
       - name: Create Pull Request to main
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.PAT_TOKEN }}  # `PAT_TOKEN` を使用
           base: main
           branch: ${{ env.BRANCH_NAME }}
           title: "Merge ${{ env.BRANCH_NAME }} into main"

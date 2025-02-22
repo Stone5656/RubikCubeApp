@@ -57,6 +57,7 @@ jobs:
       - name: Create PR to main
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.PAT_TOKEN }}  # `PAT_TOKEN` を使用
           base: main
           branch: version-bump/${{ env.NEW_VERSION }}
           title: "Bump version to ${{ env.NEW_VERSION }}"

@@ -22,21 +22,12 @@ jobs:
         id: branch_name
         run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
-      # - name: Create Pull Request to main
-      #   uses: peter-evans/create-pull-request@v6
-      #   with:
-      #     token: ${{ secrets.PAT_TOKEN }}  # ← ここを修正 (デフォルトの `GITHUB_TOKEN` ではなく `PAT_TOKEN` を使用)
-      #     base: main
-      #     branch: ${{ env.BRANCH_NAME }}
-      #     title: "Merge ${{ env.BRANCH_NAME }} into main"
-      #     body: "Automated PR to merge ${{ env.BRANCH_NAME }} into main"
-      #     labels: automated
-      - name: Push changes to development
-        env:
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/Stone5656/RubikCubeApp.git
-          git push origin development
-
+      - name: Create Pull Request to main
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PAT_TOKEN }}  # ← ここを修正 (デフォルトの `GITHUB_TOKEN` ではなく `PAT_TOKEN` を使用)
+          base: main
+          branch: ${{ env.BRANCH_NAME }}
+          title: "Merge ${{ env.BRANCH_NAME }} into main"
+          body: "Automated PR to merge ${{ env.BRANCH_NAME }} into main"
+          labels: automated

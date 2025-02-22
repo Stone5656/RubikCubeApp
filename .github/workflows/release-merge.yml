@@ -18,8 +18,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          cd test
-          ./run_tests.sh  # ← ここにテスト実行スクリプトを記述
+          pytest -v -k "test_stl_to_ply" # ← ここにテスト実行スクリプトを記述
 
       - name: Merge if tests pass
         if: success()

@@ -1,0 +1,27 @@
+name: Create PR from main to release
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed  # PR がマージされたときに実行
+
+jobs:
+  create-pr:
+    if: github.event.pull_request.merged == true  # PR がマージされた場合のみ実行
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Pull Request to release
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PAT_TOKEN }}  # `PAT_TOKEN` を使用
+          base: release
+          branch: main
+          title: "Merge main into release"
+          body: "Automated PR to merge main into release"
+          labels: automated

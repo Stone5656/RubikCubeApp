@@ -4,13 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js Flask Viewer</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>Three.js Flask 3D Viewer</title>
+
+    <!-- Import Map を追加 -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+            "three/examples/jsm/controls/OrbitControls.js": "https://unpkg.com/three@0.128.0/examples/jsm/controls/OrbitControls.js",
+            "three/examples/jsm/loaders/STLLoader.js": "https://unpkg.com/three@0.128.0/examples/jsm/loaders/STLLoader.js"
+        }
+    }
+    </script>
 </head>
 
 <body>
     <canvas id="threeCanvas"></canvas>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <!-- modelPath をグローバル変数として定義 -->
+    <script>
+        window.modelPath = "/static/{{ model_file }}";  // Flask からモデルのURLを渡す
+        console.log("Model Path:", window.modelPath);  // デバッグ用
+    </script>
+
+    <!-- Three.js の ESモジュールを含むスクリプト -->
+    <script type="module" src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 
 </html>

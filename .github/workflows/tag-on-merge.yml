@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write  # PR 作成権限を付与
 
 jobs:
   tag-on-merge:
@@ -31,3 +32,25 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git tag ${{ env.VERSION }}
           git push https://x-access-token:${PAT_TOKEN}@github.com/Stone5656/RubikCubeApp.git ${{ env.VERSION }}
+
+      - name: Create PR to fix and development
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          base: fix
+          branch: update-version/${{ env.VERSION }}
+          title: "Sync version ${{ env.VERSION }} with fix"
+          body: "This PR updates `fix` branch with the latest version."
+          labels: automated
+          commit-message: "Sync version ${{ env.VERSION }} with fix"
+
+      - name: Create PR to development
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          base: development
+          branch: update-version/${{ env.VERSION }}
+          title: "Sync version ${{ env.VERSION }} with development"
+          body: "This PR updates `development` branch with the latest version."
+          labels: automated
+          commit-message: "Sync version ${{ env.VERSION }} with development"

@@ -83,13 +83,33 @@ jobs:
           echo "DIFF_COUNT=$DIFF_COUNT" >> $GITHUB_ENV
         continue-on-error: false  # エラーなら止める
 
+      - name: Fetch latest changes
+        run: |
+          git fetch --prune --unshallow origin
+          git fetch --all
+
+      - name: Debug commit differences
+        run: |
+          echo "Checking commits between main and ${{ github.ref_name }}"
+          git log --oneline --graph --decorate --abbrev-commit origin/main..origin/${{ github.ref_name }}
+
+      - name: Check if HEAD is different from main
+        id: check_changes
+        run: |
+          if [ "$(git rev-parse origin/main)" != "$(git rev-parse origin/${{ github.ref_name }})" ]; then
+            echo "DIFF_COUNT=1" >> $GITHUB_ENV
+          else
+            echo "DIFF_COUNT=0" >> $GITHUB_ENV
+          fi
+
       - name: Debug git diff
         if: env.DIFF_COUNT == '0'
         run: |
-          echo "Expected changes, but git rev-list returned 0. Dumping git diff:"
+          echo "Expected changes, but git rev-parse returned 0. Dumping git diff:"
           git diff origin/main origin/${{ github.ref_name }}
 
       - name: Create PR from fix/development to main
+        if: env.DIFF_COUNT != '0'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.PAT_TOKEN }}
@@ -101,4 +121,4 @@ jobs:
           commit-message: "Bump version to ${{ env.NEW_VERSION }}"
           branch-suffix: timestamp
           delete-branch: false
-          debug: true  # ログを詳細に取得
+

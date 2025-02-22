@@ -9,7 +9,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write  # PR 作成権限を付与
 
 jobs:
   tag-on-merge:
@@ -38,7 +37,7 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           base: fix
-          branch: update-version/${{ env.VERSION }}
+          branch: main
           title: "Sync version ${{ env.VERSION }} with fix"
           body: "This PR updates `fix` branch with the latest version."
           labels: automated
@@ -49,7 +48,7 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           base: development
-          branch: update-version/${{ env.VERSION }}
+          branch: main
           title: "Sync version ${{ env.VERSION }} with development"
           body: "This PR updates `development` branch with the latest version."
           labels: automated

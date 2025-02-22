@@ -56,16 +56,13 @@ jobs:
       - name: Create Version File
         run: echo "${{ env.NEW_VERSION }}" > VERSION
 
-      - name: Create PR to main
+      - name: Create PR from fix/development to main
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.PAT_TOKEN }}
           base: main
-          branch: version-bump/${{ env.NEW_VERSION }}
-          title: "Bump version to ${{ env.NEW_VERSION }}"
-          body: "Automated PR to merge ${{ env.NEW_VERSION }}"
+          branch: ${{ github.ref_name }} # `fix` または `development`
+          title: "Merge `${{ github.ref_name }}` into main"
+          body: "Automated PR to merge `${{ github.ref_name }}` into main"
           labels: automated, versioning
           commit-message: "Bump version to ${{ env.NEW_VERSION }}"
-          delete-branch: true # PR マージ後にブランチを削除
-          branch-suffix: timestamp # 重複防止
-          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>

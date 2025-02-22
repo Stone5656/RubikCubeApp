@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # すべての履歴を取得
 
       - name: Fetch all tags
         run: git fetch --tags
@@ -57,10 +59,13 @@ jobs:
       - name: Create PR to main
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.PAT_TOKEN }}  # `PAT_TOKEN` を使用
+          token: ${{ secrets.PAT_TOKEN }}
           base: main
           branch: version-bump/${{ env.NEW_VERSION }}
           title: "Bump version to ${{ env.NEW_VERSION }}"
-          body: "Automated version bump to ${{ env.NEW_VERSION }}"
+          body: "Automated PR to merge ${{ env.NEW_VERSION }}"
           labels: automated, versioning
           commit-message: "Bump version to ${{ env.NEW_VERSION }}"
+          delete-branch: true # PR マージ後にブランチを削除
+          branch-suffix: timestamp # 重複防止
+          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>

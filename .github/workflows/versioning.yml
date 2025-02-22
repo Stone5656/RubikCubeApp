@@ -66,27 +66,39 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add VERSION
+          git add -A
           git commit -m "Bump version to ${{ env.NEW_VERSION }}" || echo "No changes to commit"
           git push --force-with-lease https://x-access-token:${PAT_TOKEN}@github.com/Stone5656/RubikCubeApp.git ${{ github.ref_name }}
+
+      - name: Verify git status
+        run: |
+          git status
+          git log --oneline -n 5
 
       - name: Check if changes exist before PR
         id: check_changes
         run: |
           DIFF_COUNT=$(git rev-list --right-only --count origin/main...origin/${{ github.ref_name }})
+          echo "DIFF_COUNT=$DIFF_COUNT"
           echo "DIFF_COUNT=$DIFF_COUNT" >> $GITHUB_ENV
-          echo "Diff count: $DIFF_COUNT"
+        continue-on-error: false  # エラーなら止める
+
+      - name: Debug git diff
+        if: env.DIFF_COUNT == '0'
+        run: |
+          echo "Expected changes, but git rev-list returned 0. Dumping git diff:"
+          git diff origin/main origin/${{ github.ref_name }}
 
       - name: Create PR from fix/development to main
-        if: env.DIFF_COUNT != '0' # 変更がある場合のみPR作成
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.PAT_TOKEN }}
           base: main
-          branch: ${{ github.ref_name }} # `fix` または `development`
+          branch: ${{ github.ref_name }}
           title: "Merge `${{ github.ref_name }}` into main"
           body: "Automated PR to merge `${{ github.ref_name }}` into main"
           labels: automated, versioning
           commit-message: "Bump version to ${{ env.NEW_VERSION }}"
-          branch-suffix: short-commit-hash # 競合防止
+          branch-suffix: timestamp
           delete-branch: false
+          debug: true  # ログを詳細に取得

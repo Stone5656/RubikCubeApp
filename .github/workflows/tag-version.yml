@@ -20,9 +20,9 @@ jobs:
           fetch-depth: 0          # タグの作成には全履歴を取得する必要がある
 
       - name: Get Latest Tag
-        id: get_latest_tag
         run: |
-          LATEST_TAG=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+          git fetch --tags
+          LATEST_TAG=$(git describe --tags --always --abbrev=0 || echo "v0.0.0")
           echo "Latest Tag: $LATEST_TAG"
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
 

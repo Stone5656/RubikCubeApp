@@ -42,11 +42,19 @@ jobs:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
-          echo "Creating PR from $BRANCH_NAME to main"
+          echo "Creating PR from $BRANCH_NAME to main..."
 
+          # 既存の PR をチェック
+          EXISTING_PR=$(gh pr list --base main --head "$BRANCH_NAME" --json number --jq '.[0].number')
+
+          if [[ -n "$EXISTING_PR" ]]; then
+            echo "✅ A pull request from '$BRANCH_NAME' to 'main' already exists: https://github.com/${{ github.repository }}/pull/$EXISTING_PR"
+            exit 0  # エラー扱いせずに正常終了
+          fi
+
+          # PR を作成
           gh pr create \
             --base main \
             --head "$BRANCH_NAME" \
             --title "Automated PR from $BRANCH_NAME" \
             --body "This PR was automatically created by GitHub Actions."
-

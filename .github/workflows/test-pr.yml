@@ -17,7 +17,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}  # PR の head ブランチを取得
-          submodules: true        # サブモジュールも取得
           fetch-depth: 0  # 全履歴を取得
 
       - name: Check Mergeability
@@ -44,6 +43,8 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run Tests (if needed)
+        env:
+          PYTHONPATH: ${{ github.workspace }}/src  # GitHub Actionsのパスを動的に取得
         run: |
           echo "Running tests for PR targeting 'main'..."
           pytest -v -k "test_stl_to_ply"

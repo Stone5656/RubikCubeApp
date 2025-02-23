@@ -53,12 +53,3 @@ jobs:
         run: |
           echo "PYTHONPATH is set to: $PYTHONPATH"
           pytest -v -k "test_stl_to_ply"
-
-      - name: Auto-Merge PR (if tests pass)
-        env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}  # パーソナルアクセストークン (PAT) を使用
-        run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          echo "✅ All tests passed! Attempting to merge PR #$PR_NUMBER..."
-
-          gh pr merge $PR_NUMBER --merge --delete-branch

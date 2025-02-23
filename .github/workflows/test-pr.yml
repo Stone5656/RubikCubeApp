@@ -49,7 +49,7 @@ jobs:
 
       - name: Run Tests
         env:
-          PYTHONPATH: ${{ github.workspace }}/src  # `src/` を Python の検索パスに追加
+          PYTHONPATH: ${{ github.workspace }}  # `src/` を Python の検索パスに追加
         run: |
           echo "PYTHONPATH is set to: $PYTHONPATH"
           pytest -v -k "test_stl_to_ply"

@@ -1,0 +1,62 @@
+name: Create Tag on PR Merge
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true  # PRがマージされた場合のみ実行
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true        # サブモジュールも取得
+          fetch-depth: 0          # タグの作成には全履歴を取得する必要がある
+
+      - name: Get Latest Tag
+        id: get_latest_tag
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+          echo "Latest Tag: $LATEST_TAG"
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Determine New Tag
+        id: determine_tag
+        run: |
+          HEAD_BRANCH="${{ github.event.pull_request.head.ref }}"
+          LATEST_TAG="${{ env.LATEST_TAG }}"
+
+          # バージョンを分割
+          MAJOR=$(echo $LATEST_TAG | cut -d. -f1 | sed 's/v//')
+          MINOR=$(echo $LATEST_TAG | cut -d. -f2)
+          PATCH=$(echo $LATEST_TAG | cut -d. -f3)
+
+          if [[ "$HEAD_BRANCH" == "fix" ]]; then
+            PATCH=$((PATCH + 1))  # パッチバージョンをインクリメント
+          elif [[ "$HEAD_BRANCH" == "deployment" ]]; then
+            MINOR=$((MINOR + 1))  # マイナーバージョンをインクリメント
+            PATCH=0  # パッチはリセット
+          else
+            echo "No tagging for this branch."
+            exit 0
+          fi
+
+          NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "New Tag: $NEW_TAG"
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+      - name: Create and Push Tag
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git tag $NEW_TAG
+          git push origin $NEW_TAG

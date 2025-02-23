@@ -11,6 +11,8 @@ open3d = "^0.19.0"
 numpy = "^2.2.3"
 glfw = "^2.8.0"
 flask = "^3.1.0"
+setuptools = "^75.8.0"
+pytest-cov = "^6.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.0"

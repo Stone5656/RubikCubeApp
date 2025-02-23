@@ -1,0 +1,60 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - development
+      - fix
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}  # プッシュされたブランチを取得
+          submodules: true        # サブモジュールも取得
+          fetch-depth: 0          # すべての履歴を取得（デフォルトは1）
+
+
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check for Existing PR
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
+          PR_EXISTS=$(gh pr list --base main --head "$BRANCH_NAME" --json number --jq '.[0].number')
+
+          if [[ -n "$PR_EXISTS" ]]; then
+            echo "PR already exists: #$PR_EXISTS"
+            exit 0
+          fi
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
+          echo "Creating PR from $BRANCH_NAME to main..."
+
+          # 既存の PR をチェック
+          EXISTING_PR=$(gh pr list --base main --head "$BRANCH_NAME" --json number --jq '.[0].number')
+
+          if [[ -n "$EXISTING_PR" ]]; then
+            echo "✅ A pull request from '$BRANCH_NAME' to 'main' already exists: https://github.com/${{ github.repository }}/pull/$EXISTING_PR"
+            exit 0  # エラー扱いせずに正常終了
+          fi
+
+          # PR を作成
+          gh pr create \
+            --base main \
+            --head "$BRANCH_NAME" \
+            --title "Automated PR from $BRANCH_NAME" \
+            --body "This PR was automatically created by GitHub Actions."

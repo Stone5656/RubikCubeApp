@@ -19,6 +19,11 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}  # PR の head ブランチを取得
           fetch-depth: 0  # 全履歴を取得
 
+      - name: Debug - List Repository Files
+        run: |
+          echo "Current Directory: $(pwd)"
+          ls -R
+
       - name: Check Mergeability
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -42,11 +47,11 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Run Tests (if needed)
+      - name: Run Tests
         env:
-          PYTHONPATH: ${{ github.workspace }}/src  # GitHub Actionsのパスを動的に取得
+          PYTHONPATH: ${{ github.workspace }}/src  # `src/` を Python の検索パスに追加
         run: |
-          echo "Running tests for PR targeting 'main'..."
+          echo "PYTHONPATH is set to: $PYTHONPATH"
           pytest -v -k "test_stl_to_ply"
 
       - name: Auto-Merge PR (if tests pass)

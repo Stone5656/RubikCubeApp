@@ -38,7 +38,7 @@ jobs:
 
           if [[ "$HEAD_BRANCH" == "fix" ]]; then
             PATCH=$((PATCH + 1))  # パッチバージョンをインクリメント
-          elif [[ "$HEAD_BRANCH" == "deployment" ]]; then
+          elif [[ "$HEAD_BRANCH" == "development" ]]; then
             MINOR=$((MINOR + 1))  # マイナーバージョンをインクリメント
             PATCH=0  # パッチはリセット
           else

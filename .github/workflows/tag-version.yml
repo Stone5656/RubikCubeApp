@@ -56,6 +56,9 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git branch --show-current
+          git tag -n
+          echo "$NEW_TAG"
 
           git tag $NEW_TAG
           git push origin $NEW_TAG

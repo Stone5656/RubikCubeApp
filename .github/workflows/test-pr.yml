@@ -69,6 +69,6 @@ jobs:
           BASE_BRANCH=${{ github.base_ref }}  # mainブランチの取得
 
           echo "✅ Merging PR #$PR_NUMBER into $BASE_BRANCH..."
-          gh pr merge $PR_NUMBER --merge --auto --admin
+          gh pr merge $PR_NUMBER --merge --auto
 
           echo "🎉 PR #$PR_NUMBER merged successfully!"

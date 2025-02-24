@@ -1,12 +1,17 @@
-name: PR Test
+name: PR Test and Merge
 
 on:
   pull_request:
     types:
       - opened
       - synchronize
+      - ready_for_review  # Draft PRがReadyになったら実行
     branches:
       - main
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   test-pr:
@@ -26,7 +31,7 @@ jobs:
 
       - name: Check Mergeability
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
           MERGEABLE=$(gh pr view $PR_NUMBER --json mergeable --jq '.mergeable')
@@ -50,7 +55,20 @@ jobs:
 
       - name: Run Tests
         env:
-          PYTHONPATH: ${{ github.workspace }}  # `src/` を Python の検索パスに追加
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           echo "PYTHONPATH is set to: $PYTHONPATH"
           pytest -q --disable-warnings --maxfail=1 -k "test_stl_to_ply"
+
+      - name: Merge PR (if tests pass)
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          BASE_BRANCH=${{ github.base_ref }}  # mainブランチの取得
+
+          echo "✅ Merging PR #$PR_NUMBER into $BASE_BRANCH..."
+          gh pr merge $PR_NUMBER --merge --auto
+
+          echo "🎉 PR #$PR_NUMBER merged successfully!"

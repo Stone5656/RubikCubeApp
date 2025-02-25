@@ -30,3 +30,16 @@ export const MAX_POLAR_ANGLE = Math.PI; // カメラの回転角度の上限（1
 export const LIGHT_COLOR = 0xffffff; // ライトの色
 export const LIGHT_INTENSITY = 1; // 光の強さ
 export const LIGHT_POSITION = [5, 5, 5]; // ライトの初期位置
+
+// === メッシュ設定用オプション ===
+export const MESH_SETUP_OPTIONS = {
+    scale: [0.5, 0.5, 0.5],       // 1.5倍のスケール
+    position: [0, -2, 0],         // y=-2 の位置
+    rotation: [0, Math.PI / 2, 0], // y軸で90度回転
+    opacity: 0.8,                 // 半透明
+    transparent: true,             // 透明化を有効化
+    wireframe: false,              // ワイヤーフレーム表示をオフ
+    color: 0xff0000,               // 赤色
+    receiveShadow: true,           // 影を受け取る
+    castShadow: true,              // 影を落とす
+};

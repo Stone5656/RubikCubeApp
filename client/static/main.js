@@ -6,7 +6,8 @@ import {
     ENABLE_ANTIALIAS, BACKGROUND_COLOR, ENABLE_TRANSPARENCY, ENABLE_SHADOWS, CANVAS,
     ENABLE_DAMPING, DAMPING_FACTOR, ENABLE_PAN, KEY_PAN_SPEED,
     SCREEN_SPACE_PANNING, MIN_DISTANCE, MAX_DISTANCE, MAX_POLAR_ANGLE,
-    LIGHT_COLOR, LIGHT_INTENSITY, LIGHT_POSITION
+    LIGHT_COLOR, LIGHT_INTENSITY, LIGHT_POSITION,
+    MESH_SETUP_OPTIONS
 } from "./config.js"; // 定数をインポート
 
 /** メイン関数 */
@@ -18,7 +19,7 @@ async function main() {
     const Scene = await import("./scene/index.js");
 
     // **Proxyを回避するために個別に取り出す**
-    const { setupScene, createCamera, generateRenderer, setupControls, setupLights } = Scene;
+    const { setupScene, createCamera, generateRenderer, setupControls, setupLights, setupMesh } = Scene;
 
     // === シーンの初期化 ===
 
@@ -66,8 +67,21 @@ async function main() {
     const material = new THREE.MeshNormalMaterial({ wireframe: false });
 
     try {
-        const mesh = await loadModel(scene, modelPath, material);
-        startAnimation(scene, camera, renderer, controls, [mesh]);
+        let mesh = await loadModel(
+            scene,
+            modelPath,
+            material
+        );
+
+        mesh = await setupMesh(mesh, MESH_SETUP_OPTIONS);
+
+        startAnimation(
+            scene,
+            camera,
+            renderer,
+            controls,
+            [mesh]
+        );
     } catch (error) {
         console.error(error);
     }

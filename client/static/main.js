@@ -102,40 +102,7 @@ async function startAnimation(scene, camera, renderer, controls, meshArray) {
     function renderLoop() {
         requestAnimationFrame(renderLoop);
 
-        if (meshArray.length > 0 && moving) {
-            const speed = 0.1;
-
-            // 各メッシュの移動処理
-            meshArray.forEach((mesh, index) => {
-                if (index % 2 === 0 && mesh.position.x > 0) {
-                    mesh.position.x -= speed;
-                } else if (index % 2 !== 0 && mesh.position.x < 0) {
-                    mesh.position.x += speed;
-                }
-            });
-
-            // すべてのモデルが中央 (x=0) に到達したかチェック
-            if (
-                meshArray.every((mesh, index) =>
-                    index % 2 === 0 ? mesh.position.x <= 0 : mesh.position.x >= 0
-                ) && resetTimer === null
-            ) {
-                moving = false; // 移動を停止
-                resetTimer = setTimeout(() => {
-                    // すべてのメッシュを元の位置に戻す
-                    meshArray.forEach((mesh, index) => {
-                        if (index % 2 === 0) {
-                            mesh.position.x = 10;
-                        } else {
-                            mesh.position.x = -10;
-                        }
-                    });
-
-                    moving = true;
-                    resetTimer = null;
-                }, 2000); // 2秒後にリセット
-            }
-        }
+        meshArray[0]
 
         controls.update();
         renderer.render(scene, camera);

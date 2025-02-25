@@ -8,17 +8,17 @@
 
     <!-- Import Map を追加 -->
     <script type="importmap">
-    {
-        "imports": {
-            "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
-            "three/examples/jsm/controls/OrbitControls.js": "https://unpkg.com/three@0.128.0/examples/jsm/controls/OrbitControls.js",
-            "three/examples/jsm/loaders/STLLoader.js": "https://unpkg.com/three@0.128.0/examples/jsm/loaders/STLLoader.js"
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/examples/jsm/controls/OrbitControls.js": "https://unpkg.com/three@0.128.0/examples/jsm/controls/OrbitControls.js",
+                "three/examples/jsm/loaders/STLLoader.js": "https://unpkg.com/three@0.128.0/examples/jsm/loaders/STLLoader.js"
+            }
         }
-    }
     </script>
 </head>
 
-<body>
+<body style="margin: 0;">
     <canvas id="threeCanvas"></canvas>
 
     <!-- modelPath をグローバル変数として定義 -->
@@ -28,7 +28,8 @@
     </script>
 
     <!-- Three.js の ESモジュールを含むスクリプト -->
-    <script type="module" src="{{ url_for('static', filename='script.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='asyncImporters.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 
 </html>

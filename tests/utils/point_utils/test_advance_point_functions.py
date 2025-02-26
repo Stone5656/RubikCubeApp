@@ -1,52 +1,74 @@
+import pytest
 import open3d as o3d
 import numpy as np
+from src.utils.point_utils.advance_point_functions import (
+    merge_point_clouds,
+    mirror_points,
+    rotate_points,
+    translate_points
+)
+from src.utils.point_utils.base_point_functions import create_point_cloud
 
 
+def test_mirror_points():
+    points = np.array([[1, 2, 3], [-1, -2, -3], [4, 5, 6]])
+    pcd = create_point_cloud(points)
 
-def mirror_points(pcd: o3d.geometry.PointCloud, axis: str) -> o3d.geometry.PointCloud:
-    """指定した軸(x, y, z)を基準に点群を反転（副作用なし）"""
-    mirrored_pcd = pcd.clone()
-    points = np.asarray(pcd.points)
+    # x軸反転
+    mirrored_x = mirror_points(pcd, "x")
+    expected_x = np.array([[-1, 2, 3], [1, -2, -3], [-4, 5, 6]])
+    np.testing.assert_allclose(np.asarray(mirrored_x.points), expected_x)
 
-    if axis == "x":
-        points[:, 0] *= -1
-    elif axis == "y":
-        points[:, 1] *= -1
-    elif axis == "z":
-        points[:, 2] *= -1
-    else:
-        raise ValueError("axis must be 'x', 'y', or 'z'")
+    # y軸反転
+    mirrored_y = mirror_points(pcd, "y")
+    expected_y = np.array([[-1, -2, 3], [1, 2, -3], [-4, -5, 6]])
+    np.testing.assert_allclose(np.asarray(mirrored_y.points), expected_y)
 
-    mirrored_pcd.points = o3d.utility.Vector3dVector(points)
-    return mirrored_pcd
+    # z軸反転
+    mirrored_z = mirror_points(pcd, "z")
+    expected_z = np.array([[-1, -2, -3], [1, 2, 3], [-4, -5, -6]])
+    np.testing.assert_allclose(np.asarray(mirrored_z.points), expected_z)
 
-
-def translate_points(
-    pcd: o3d.geometry.PointCloud, translation: tuple
-) -> o3d.geometry.PointCloud:
-    """点群を指定した(x, y, z)の方向に平行移動（副作用なし）"""
-    translated_pcd = pcd.clone()
-    points = np.asarray(pcd.points) + np.array(translation)
-    translated_pcd.points = o3d.utility.Vector3dVector(points)
-    return translated_pcd
+    # 無効な軸
+    with pytest.raises(ValueError):
+        mirror_points(pcd, "w")
 
 
-def rotate_points(
-    pcd: o3d.geometry.PointCloud, rotation_matrix: np.ndarray
-) -> o3d.geometry.PointCloud:
-    """点群を指定した回転行列で回転（副作用なし）"""
-    rotated_pcd = pcd.clone()
-    points = np.asarray(pcd.points) @ rotation_matrix.T
-    rotated_pcd.points = o3d.utility.Vector3dVector(points)
-    return rotated_pcd
+def test_translate_points():
+    points = np.array([[1, 2, 3], [4, 5, 6]])
+    pcd = create_point_cloud(points)
+    translated = translate_points(pcd, (1, -1, 2))
+    expected = np.array([[2, 1, 5], [5, 4, 8]])
+    np.testing.assert_allclose(np.asarray(translated.points), expected)
 
 
-def merge_point_clouds(
-    pcd1: o3d.geometry.PointCloud, pcd2: o3d.geometry.PointCloud
-) -> o3d.geometry.PointCloud:
-    """2つの点群を統合する（副作用なし）"""
-    merged_pcd = o3d.geometry.PointCloud()
-    merged_pcd.points = o3d.utility.Vector3dVector(
-        np.vstack((np.asarray(pcd1.points), np.asarray(pcd2.points)))
+def test_rotate_points():
+    points = np.array([[1, 0, 0], [0, 1, 0]])
+    pcd = create_point_cloud(points)
+
+    # 90度回転 (z軸)
+    theta = np.pi / 2
+    rotation_matrix = np.array(
+        [
+            [np.cos(theta), -np.sin(theta), 0],
+            [np.sin(theta), np.cos(theta), 0],
+            [0, 0, 1],
+        ]
     )
-    return merged_pcd
+    rotated = rotate_points(pcd, rotation_matrix)
+    expected = np.array([[0, 1, 0], [-1, 0, 0]])
+    np.testing.assert_allclose(np.asarray(rotated.points), expected, atol=1e-7)
+
+
+def test_merge_point_clouds():
+    points1 = np.array([[1, 2, 3], [4, 5, 6]])
+    points2 = np.array([[7, 8, 9], [10, 11, 12]])
+    pcd1 = create_point_cloud(points1)
+    pcd2 = create_point_cloud(points2)
+    merged = merge_point_clouds(pcd1, pcd2)
+    expected = np.vstack((points1, points2))
+    np.testing.assert_allclose(np.asarray(merged.points), expected)
+
+    # 副作用がないことの確認
+    assert np.array_equal(np.asarray(pcd1.points), points1)
+    assert np.array_equal(np.asarray(pcd2.points), points2)

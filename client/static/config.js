@@ -11,7 +11,7 @@ export const ASPECT_RATIO = WINDOW_WIDTH / WINDOW_HEIGHT; // アスペクト比�
 
 // === レンダラー設定 ===
 export const ENABLE_ANTIALIAS = true; // アンチエイリアス（滑らかな描画）
-export const BACKGROUND_COLOR = 0xffffff; // 背景色（黒）
+export const BACKGROUND_COLOR = 0x000000; // 背景色（黒）
 export const ENABLE_TRANSPARENCY = false; // 透明背景の有効化
 export const ENABLE_SHADOWS = true; // 影の有効化
 export const CANVAS = document.getElementById("threeCanvas");

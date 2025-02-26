@@ -70,10 +70,12 @@ async function main() {
         let mesh = await loadModel(
             scene,
             modelPath,
-            material
+            material,
+            false,
+            true
         );
 
-        mesh = await setupMesh(mesh, MESH_SETUP_OPTIONS);
+        // mesh = await setupMesh(mesh, MESH_SETUP_OPTIONS);
 
         startAnimation(
             scene,

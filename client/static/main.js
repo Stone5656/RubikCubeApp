@@ -70,12 +70,14 @@ async function main() {
         let mesh = await loadModel(
             scene,
             modelPath,
-            material,
-            false,
-            true
+            material
         );
 
-        mesh = await setupObject(mesh, BASE_SETUP_OPTIONS, POINT_OPTIONS);
+        mesh = await setupObject(
+            mesh,
+            BASE_SETUP_OPTIONS,
+            POINT_OPTIONS
+        );
 
         startAnimation(
             scene,

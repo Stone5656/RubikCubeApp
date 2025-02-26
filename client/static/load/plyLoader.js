@@ -9,7 +9,7 @@ import { importPLYLoader } from "../asyncImporters.js";
  * @param {boolean} computeNormals - 法線を計算するか（デフォルト: false）
  * @param {boolean} asPointCloud - 点群のまま出力するか（デフォルト: false）
  */
-export async function loadPLY(modelPath, material, callback, computeNormals = false, asPointCloud = false) {
+export async function loadPLY(modelPath, material, callback, computeNormals = false, asPointCloud = true) {
     const THREE = await importThree();
     const { PLYLoader } = await importPLYLoader();
     const loader = new PLYLoader();

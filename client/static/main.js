@@ -7,7 +7,7 @@ import {
     ENABLE_DAMPING, DAMPING_FACTOR, ENABLE_PAN, KEY_PAN_SPEED,
     SCREEN_SPACE_PANNING, MIN_DISTANCE, MAX_DISTANCE, MAX_POLAR_ANGLE,
     LIGHT_COLOR, LIGHT_INTENSITY, LIGHT_POSITION,
-    MESH_SETUP_OPTIONS
+    BASE_SETUP_OPTIONS, MESH_OPTIONS, POINT_OPTIONS
 } from "./config.js"; // 定数をインポート
 
 /** メイン関数 */
@@ -19,7 +19,7 @@ async function main() {
     const Scene = await import("./scene/index.js");
 
     // **Proxyを回避するために個別に取り出す**
-    const { setupScene, createCamera, generateRenderer, setupControls, setupLights, setupMesh } = Scene;
+    const { setupScene, createCamera, generateRenderer, setupControls, setupLights, setupObject } = Scene;
 
     // === シーンの初期化 ===
 
@@ -70,10 +70,12 @@ async function main() {
         let mesh = await loadModel(
             scene,
             modelPath,
-            material
+            material,
+            false,
+            true
         );
 
-        mesh = await setupMesh(mesh, MESH_SETUP_OPTIONS);
+        mesh = await setupObject(mesh, BASE_SETUP_OPTIONS, POINT_OPTIONS);
 
         startAnimation(
             scene,

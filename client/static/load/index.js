@@ -9,7 +9,7 @@ import { loadPLY } from "./plyLoader.js";
  * @param {THREE.Material} material - 使用するマテリアル
  * @returns {Promise<THREE.Mesh | THREE.Object3D>} ロードされたメッシュまたはオブジェクト
  */
-export async function loadModel(scene, modelPath, material) {
+export async function loadModel(scene, modelPath, material, computeNormals = false, asPointCloud = false) {
     return new Promise(async (resolve, reject) => {
         const extension = modelPath.split(".").pop().toLowerCase();
 
@@ -26,7 +26,7 @@ export async function loadModel(scene, modelPath, material) {
                 await loadOBJ(modelPath, material, onLoad);
                 break;
             case "ply":
-                await loadPLY(modelPath, material, onLoad);
+                await loadPLY(modelPath, material, onLoad, computeNormals, asPointCloud);
                 break;
             default:
                 reject(new Error(`Unsupported file format: ${extension}`));

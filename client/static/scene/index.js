@@ -3,4 +3,4 @@ export { createCamera } from "./cameraSetup.js";
 export { generateRenderer } from "./rendererSetup.js";
 export { setupControls } from "./controlsSetup.js";
 export { setupLights } from "./lightSetup.js"
-export { setupMesh } from "./setupMesh.js"
+export { setupObject } from "./setupObject.js"

@@ -1,20 +1,29 @@
+from enum import Enum
 import open3d as o3d
 import numpy as np
 
 
-def mirror_points(pcd: o3d.geometry.PointCloud, axis: str) -> o3d.geometry.PointCloud:
-    """指定した軸(x, y, z)を基準に点群を反転（副作用あり）"""
+
+class Axis(Enum):
+    X = "x"
+    Y = "y"
+    Z = "z"
+
+
+def mirror_points(pcd: o3d.geometry.PointCloud, axis: Axis) -> o3d.geometry.PointCloud:
+    """指定した軸(Axis.X, Axis.Y, Axis.Z)を基準に点群を反転（副作用あり）"""
 
     points = np.asarray(pcd.points)
 
-    if axis == "x":
-        points[:, 0] *= -1
-    elif axis == "y":
-        points[:, 1] *= -1
-    elif axis == "z":
-        points[:, 2] *= -1
-    else:
-        raise ValueError("axis must be 'x', 'y', or 'z'")
+    match axis:
+        case Axis.X:
+            points[:, 0] *= -1
+        case Axis.Y:
+            points[:, 1] *= -1
+        case Axis.Z:
+            points[:, 2] *= -1
+        case _:
+            raise ValueError("Invalid axis")
 
     pcd.points = o3d.utility.Vector3dVector(points)
     return pcd

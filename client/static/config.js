@@ -11,7 +11,7 @@ export const ASPECT_RATIO = WINDOW_WIDTH / WINDOW_HEIGHT; // アスペクト比�
 
 // === レンダラー設定 ===
 export const ENABLE_ANTIALIAS = true; // アンチエイリアス（滑らかな描画）
-export const BACKGROUND_COLOR = 0xffffff; // 背景色（黒）
+export const BACKGROUND_COLOR = 0x000000; // 背景色（黒）
 export const ENABLE_TRANSPARENCY = false; // 透明背景の有効化
 export const ENABLE_SHADOWS = true; // 影の有効化
 export const CANVAS = document.getElementById("threeCanvas");
@@ -34,15 +34,29 @@ export const LIGHT_POSITION = [5, 5, 5]; // ライトの初期位置
 // 🔥 角度をラジアンに変換するための定数
 export const DEGREES_TO_RADIANS = Math.PI / 180; // 1° = π / 180 ラジアン
 
-// === メッシュ設定用オプション ===
-export const MESH_SETUP_OPTIONS = {
-    scale: [0.5, 0.5, 0.5],       // 1.5倍のスケール
-    position: [0, -2, 0],         // y=-2 の位置
-    rotation: [DEGREES_TO_RADIANS*-90, 0, 0], // y軸で90度回転
+// === 共通（Base）設定オプション ===
+export const BASE_SETUP_OPTIONS = {
+    scale: [0.5, 0.5, 0.5],        // スケール倍率
+    position: [0, -2, 0],          // 位置
+    rotation: [DEGREES_TO_RADIANS * -90, 0, 0], // 回転 (ラジアン)
+};
+
+// === メッシュ（Mesh）用設定オプション ===
+export const MESH_OPTIONS = {
     opacity: 0.8,                 // 半透明
-    transparent: true,             // 透明化を有効化
-    wireframe: false,              // ワイヤーフレーム表示をオフ
-    color: 0xff0000,               // 赤色
-    receiveShadow: true,           // 影を受け取る
-    castShadow: true,              // 影を落とす
+    transparent: true,            // 透明化を有効化
+    wireframe: false,             // ワイヤーフレーム表示をオフ
+    color: 0xff0000,              // 赤色
+    receiveShadow: true,          // 影を受け取る
+    castShadow: true,             // 影を落とす
+};
+
+// === 点群（Points）用設定オプション ===
+export const POINT_OPTIONS = {
+    opacity: 0.8,                 // 半透明
+    transparent: true,            // 透明化を有効化
+    color: 0xffffff,              // 緑色
+    size: 0.05,                    // ポイントサイズ
+    sizeAttenuation: true,        // 遠近法によるサイズ変化を有効化
+    vertexColors: false,          // 頂点ごとの色を無効化（単色）
 };

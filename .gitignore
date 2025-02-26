@@ -171,4 +171,4 @@ cython_debug/
 .pypirc
 
 client/static/models/*
-public/models/tooth/*
+public/models/*

@@ -9,7 +9,7 @@ import { loadPLY } from "./plyLoader.js";
  * @param {THREE.Material} material - 使用するマテリアル
  * @returns {Promise<THREE.Mesh | THREE.Object3D>} ロードされたメッシュまたはオブジェクト
  */
-export async function loadModel(scene, modelPath, material, computeNormals = false, asPointCloud = false) {
+export async function loadModel(scene, modelPath, material, computeNormals = undefined, asPointCloud = undefined) {
     return new Promise(async (resolve, reject) => {
         const extension = modelPath.split(".").pop().toLowerCase();
 

@@ -64,13 +64,14 @@ async function main() {
     );
 
     // === モデルのロードとアニメーション開始 ===
-    const modelPath = window.modelPath;
+    const modelPath1 = "/static/models/tooth-data-T2-14.ply";
+    const modelPath2 = "/static/models/tooth-noise.ply";
     const material = new THREE.MeshNormalMaterial({ wireframe: false });
 
     try {
         let mesh1 = await loadModel(
             scene,
-            modelPath,
+            modelPath1,
             material
         );
 
@@ -82,7 +83,7 @@ async function main() {
 
         let mesh2 = await loadModel(
             scene,
-            modelPath,
+            modelPath2,
             material
         );
 
@@ -114,6 +115,11 @@ async function main() {
     });
 }
 
+// === イージング関数（指数関数的な減速: easeOutExpo） ===
+function easeOutExpo(t) {
+    return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+}
+
 // === アニメーションループ ===
 async function startAnimation(scene, camera, renderer, controls, meshArray, textElement) {
     if (meshArray.length < 2) {
@@ -129,54 +135,76 @@ async function startAnimation(scene, camera, renderer, controls, meshArray, text
     mesh1.position.x = initialPos1;
     mesh2.position.x = initialPos2;
 
+    const DEGREES_TO_RADIANS = Math.PI / 180;
     const initialRot1 = [-90 * DEGREES_TO_RADIANS, 0, 0];
-    const initialRot2 = [-90 * DEGREES_TO_RADIANS, -45 * DEGREES_TO_RADIANS, 0];
+    const initialRot2 = [-90 * DEGREES_TO_RADIANS, -45 * DEGREES_TO_RADIANS, -45 * DEGREES_TO_RADIANS];
     mesh1.rotation.set(...initialRot1);
     mesh2.rotation.set(...initialRot2);
 
     let moving = true;
     let resetTimer = null;
     const duration = 5000; // 5秒で動かす
-    const frameRate = 60;
-    const totalFrames = (duration / 1000) * frameRate;
-    let frameCount = 0;
+    const holdDuration = 200; // 0.2秒間 95% のままにする
+    let startTime = performance.now(); // アニメーション開始時間
+
+    const maxMatchRate = 96; // 最終一致率
+    const initialTextColor = "white"; // テキストの初期色
+
+    // 初期テキスト設定
+    textElement.style.color = initialTextColor;
+    textElement.innerText = `一致率: 0%`;
 
     function renderLoop() {
         requestAnimationFrame(renderLoop);
 
         if (moving) {
-            if (frameCount < totalFrames) {
-                let progress = frameCount / totalFrames; // 進捗率 0～1
-                mesh1.position.x = initialPos1 * (1 - progress);
-                mesh2.position.x = initialPos2 * (1 - progress);
-                mesh2.rotation.y = initialRot2[1] * (1 - progress);
+            let elapsedTime = performance.now() - startTime; // 経過時間 (ms)
+            let progress = easeOutExpo(elapsedTime / duration); // イージング適用
+            let adjustedProgress = Math.min(progress, 1.0); // 100% まで進行
 
-                // 一致率を計算
-                let matchRate = Math.floor(progress * 100);
-                textElement.innerText = `一致率: ${matchRate}%`;
+            // 位置 & 回転更新（100% まで）
+            mesh1.position.x = initialPos1 * (1 - adjustedProgress);
+            mesh2.position.x = initialPos2 * (1 - adjustedProgress);
+            mesh2.rotation.y = initialRot2[1] * (1 - adjustedProgress);
+            mesh2.rotation.z = initialRot2[2] * (1 - adjustedProgress);
 
-                frameCount++;
+            // 96% に達する前はそのまま
+            let matchRate;
+            if (progress < 0.96) {
+                matchRate = Math.floor(progress * 100);
             } else {
-                mesh1.position.x = 0;
-                mesh2.position.x = 0;
-                mesh2.rotation.y = 0;
+                matchRate = 95; // 96% 以上になったら 95% のまま
+            }
+            textElement.innerText = `一致率: ${matchRate}%`;
 
-                // 100% にする
-                textElement.innerText = `一致率: 100%`;
+            // 96% を超えて 0.2 秒経過後、表記を 96% にする
+            if (progress >= 0.96 && elapsedTime >= duration + holdDuration) {
+                textElement.innerText = `一致率: ${maxMatchRate}%`;
+                textElement.style.color = "lime"; // 最終色変更
+                moving = false;
+            }
 
-                // 2秒後に初期位置に戻す
-                if (!resetTimer) {
-                    moving = false;
-                    resetTimer = setTimeout(() => {
-                        mesh1.position.x = initialPos1;
-                        mesh2.position.x = initialPos2;
-                        mesh2.rotation.y = initialRot2[1];
-                        moving = true;
-                        frameCount = 0;
-                        resetTimer = null;
-                        textElement.innerText = `一致率: 0%`; // リセット
-                    }, 2000);
-                }
+        } else {
+            mesh1.position.x = 0;
+            mesh2.position.x = 0;
+            mesh2.rotation.y = 0;
+            mesh2.rotation.z = 0;
+
+            // 2秒後に初期位置に戻す
+            if (!resetTimer) {
+                resetTimer = setTimeout(() => {
+                    mesh1.position.x = initialPos1;
+                    mesh2.position.x = initialPos2;
+                    mesh2.rotation.y = initialRot2[1];
+                    mesh2.rotation.z = initialRot2[2];
+
+                    moving = true;
+                    startTime = performance.now(); // アニメーションの時間をリセット
+                    resetTimer = null;
+
+                    textElement.innerText = `一致率: 0%`; // リセット
+                    textElement.style.color = initialTextColor; // 初期色に戻す
+                }, 2000);
             }
         }
 

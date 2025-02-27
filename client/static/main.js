@@ -147,7 +147,7 @@ async function startAnimation(scene, camera, renderer, controls, meshArray, text
     const holdDuration = 200; // 0.2秒間 95% のままにする
     let startTime = performance.now(); // アニメーション開始時間
 
-    const maxMatchRate = 96; // 最終一致率
+    const maxMatchRate = 98; // 最終一致率
     const initialTextColor = "white"; // テキストの初期色
 
     // 初期テキスト設定
@@ -170,15 +170,15 @@ async function startAnimation(scene, camera, renderer, controls, meshArray, text
 
             // 96% に達する前はそのまま
             let matchRate;
-            if (progress < 0.96) {
+            if (progress < 0.98) {
                 matchRate = Math.floor(progress * 100);
             } else {
-                matchRate = 95; // 96% 以上になったら 95% のまま
+                matchRate = 97; // 96% 以上になったら 95% のまま
             }
             textElement.innerText = `一致率: ${matchRate}%`;
 
             // 96% を超えて 0.2 秒経過後、表記を 96% にする
-            if (progress >= 0.96 && elapsedTime >= duration + holdDuration) {
+            if (progress >= 0.98 && elapsedTime >= duration + holdDuration) {
                 textElement.innerText = `一致率: ${maxMatchRate}%`;
                 textElement.style.color = "lime"; // 最終色変更
                 moving = false;

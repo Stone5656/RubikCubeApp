@@ -23,6 +23,21 @@
 
 <body style="margin: 0;">
     <canvas id="threeCanvas"></canvas>
+    <p id="matchRate">一致率: 0%</p>
+    
+    <style>
+        #matchRate {
+            position: absolute;
+            top: 70vh;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 1;
+            margin: 0 auto;
+            color: white;
+        }
+    </style>
+
 
     <!-- modelPath をグローバル変数として定義 -->
     <script>

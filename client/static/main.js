@@ -7,7 +7,8 @@ import {
     ENABLE_DAMPING, DAMPING_FACTOR, ENABLE_PAN, KEY_PAN_SPEED,
     SCREEN_SPACE_PANNING, MIN_DISTANCE, MAX_DISTANCE, MAX_POLAR_ANGLE,
     LIGHT_COLOR, LIGHT_INTENSITY, LIGHT_POSITION,
-    BASE_SETUP_OPTIONS, MESH_OPTIONS, POINT_OPTIONS
+    DEGREES_TO_RADIANS,
+    BASE_SETUP_OPTIONS, MESH_OPTIONS, POINT_OPTIONS1, POINT_OPTIONS2
 } from "./config.js"; // 定数をインポート
 
 /** メイン関数 */
@@ -67,24 +68,39 @@ async function main() {
     const material = new THREE.MeshNormalMaterial({ wireframe: false });
 
     try {
-        let mesh = await loadModel(
+        let mesh1 = await loadModel(
             scene,
             modelPath,
             material
         );
 
-        mesh = await setupObject(
-            mesh,
+        mesh1 = await setupObject(
+            mesh1,
             BASE_SETUP_OPTIONS,
-            POINT_OPTIONS
+            POINT_OPTIONS1
         );
 
-        startAnimation(
+        let mesh2 = await loadModel(
+            scene,
+            modelPath,
+            material
+        );
+
+        mesh2 = await setupObject(
+            mesh2,
+            BASE_SETUP_OPTIONS,
+            POINT_OPTIONS2
+        );
+
+        let textElement = document.getElementById("matchRate");
+
+        await startAnimation(
             scene,
             camera,
             renderer,
             controls,
-            [mesh]
+            [mesh1, mesh2],
+            textElement
         );
     } catch (error) {
         console.error(error);
@@ -99,14 +115,70 @@ async function main() {
 }
 
 // === アニメーションループ ===
-async function startAnimation(scene, camera, renderer, controls, meshArray) {
+async function startAnimation(scene, camera, renderer, controls, meshArray, textElement) {
+    if (meshArray.length < 2) {
+        console.error("meshArray には少なくとも 2 つのメッシュが必要です。");
+        return;
+    }
+
+    let mesh1 = meshArray[0];
+    let mesh2 = meshArray[1];
+
+    const initialPos1 = 10;
+    const initialPos2 = -10;
+    mesh1.position.x = initialPos1;
+    mesh2.position.x = initialPos2;
+
+    const initialRot1 = [-90 * DEGREES_TO_RADIANS, 0, 0];
+    const initialRot2 = [-90 * DEGREES_TO_RADIANS, -45 * DEGREES_TO_RADIANS, 0];
+    mesh1.rotation.set(...initialRot1);
+    mesh2.rotation.set(...initialRot2);
+
     let moving = true;
     let resetTimer = null;
+    const duration = 5000; // 5秒で動かす
+    const frameRate = 60;
+    const totalFrames = (duration / 1000) * frameRate;
+    let frameCount = 0;
 
     function renderLoop() {
         requestAnimationFrame(renderLoop);
 
-        meshArray[0]
+        if (moving) {
+            if (frameCount < totalFrames) {
+                let progress = frameCount / totalFrames; // 進捗率 0～1
+                mesh1.position.x = initialPos1 * (1 - progress);
+                mesh2.position.x = initialPos2 * (1 - progress);
+                mesh2.rotation.y = initialRot2[1] * (1 - progress);
+
+                // 一致率を計算
+                let matchRate = Math.floor(progress * 100);
+                textElement.innerText = `一致率: ${matchRate}%`;
+
+                frameCount++;
+            } else {
+                mesh1.position.x = 0;
+                mesh2.position.x = 0;
+                mesh2.rotation.y = 0;
+
+                // 100% にする
+                textElement.innerText = `一致率: 100%`;
+
+                // 2秒後に初期位置に戻す
+                if (!resetTimer) {
+                    moving = false;
+                    resetTimer = setTimeout(() => {
+                        mesh1.position.x = initialPos1;
+                        mesh2.position.x = initialPos2;
+                        mesh2.rotation.y = initialRot2[1];
+                        moving = true;
+                        frameCount = 0;
+                        resetTimer = null;
+                        textElement.innerText = `一致率: 0%`; // リセット
+                    }, 2000);
+                }
+            }
+        }
 
         controls.update();
         renderer.render(scene, camera);

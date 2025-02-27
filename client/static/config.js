@@ -53,20 +53,20 @@ export const MESH_OPTIONS = {
 
 // === 点群（Points）用設定オプション ===
 export const POINT_OPTIONS1 = {
-    opacity: 0.8,                 // 半透明
+    opacity: 0.5,                 // 半透明
     transparent: true,            // 透明化を有効化
     color: 0xffffff,              // 緑色
-    size: 0.05,                    // ポイントサイズ
+    size: 0.1,                    // ポイントサイズ
     sizeAttenuation: true,        // 遠近法によるサイズ変化を有効化
     vertexColors: false,          // 頂点ごとの色を無効化（単色）
 };
 
 // === 点群（Points）用設定オプション ===
 export const POINT_OPTIONS2 = {
-    opacity: 0.8,                 // 半透明
+    opacity: 0.5,                 // 半透明
     transparent: true,            // 透明化を有効化
     color: 0x00ff00,              // 緑色
-    size: 0.05,                    // ポイントサイズ
+    size: 0.075,                    // ポイントサイズ
     sizeAttenuation: true,        // 遠近法によるサイズ変化を有効化
     vertexColors: false,          // 頂点ごとの色を無効化（単色）
 };

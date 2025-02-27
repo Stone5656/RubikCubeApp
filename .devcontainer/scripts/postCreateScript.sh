@@ -13,6 +13,6 @@ source $(poetry env info --path)/bin/activate
 
 # `entrypoint.sh` を実行（もともとの処理）
 echo "Running entrypoint script..."
-./secret/entrypoint.sh
+sudo ./secret/entrypoint.sh
 
 echo "Post-create setup completed!"
